@@ -144,175 +144,182 @@ export default function App() {
         <p className="daybook-subtitle">Track activities, projects and assignments by date</p>
       </header>
 
-      {/* Main Form Card */}
-      <form className="daybook-card" onSubmit={handleSubmit}>
-        {/* TITLE */}
-        <div className="form-group">
-          <label className="form-label" htmlFor="entry-title">
-            What is it?
-          </label>
-          <input
-            id="entry-title"
-            className="input-underlined"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            autoComplete="off"
-          />
-        </div>
+      <div className="daybook-columns">
+        {/* Left Column: Form Card */}
+        <div className="daybook-form-col">
+          <form className="daybook-card" onSubmit={handleSubmit}>
+            {/* TITLE */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="entry-title">
+                What is it?
+              </label>
+              <input
+                id="entry-title"
+                className="input-underlined"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                autoComplete="off"
+              />
+            </div>
 
-        {/* DATE */}
-        <div className="form-group">
-          <label className="form-label" htmlFor="entry-date">
-            Date
-          </label>
-          <div className="date-input-wrapper">
-            <input
-              id="entry-date"
-              className="input-date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-            <span className="date-chevron">▼</span>
-          </div>
-        </div>
-
-        {/* TYPE */}
-        <div className="form-group">
-          <label className="form-label">Type</label>
-          <div className="segmented-row">
-            <button
-              type="button"
-              className={`seg-btn ${type === 'Activity' ? 'active-type' : ''}`}
-              onClick={() => setType('Activity')}
-            >
-              Activity
-            </button>
-            <button
-              type="button"
-              className={`seg-btn ${type === 'Project' ? 'active-type' : ''}`}
-              onClick={() => setType('Project')}
-            >
-              Project
-            </button>
-            <button
-              type="button"
-              className={`seg-btn ${type === 'Assignment' ? 'active-type' : ''}`}
-              onClick={() => setType('Assignment')}
-            >
-              Assignment
-            </button>
-          </div>
-        </div>
-
-        {/* STATUS */}
-        <div className="form-group">
-          <label className="form-label">Status</label>
-          <div className="segmented-row">
-            <button
-              type="button"
-              className={`seg-btn ${status === 'Pending' ? 'active-pending' : ''}`}
-              onClick={() => setStatus('Pending')}
-            >
-              Pending
-            </button>
-            <button
-              type="button"
-              className={`seg-btn ${status === 'In Progress' ? 'active-inprogress' : ''}`}
-              onClick={() => setStatus('In Progress')}
-            >
-              In Progress
-            </button>
-            <button
-              type="button"
-              className={`seg-btn ${status === 'Completed' ? 'active-completed' : ''}`}
-              onClick={() => setStatus('Completed')}
-            >
-              Completed
-            </button>
-          </div>
-        </div>
-
-        {/* NOTES */}
-        <div className="form-group">
-          <label className="form-label" htmlFor="entry-notes">
-            Notes
-          </label>
-          <textarea
-            id="entry-notes"
-            className="input-notes"
-            rows="2"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        </div>
-
-        {/* SUBMIT BUTTON */}
-        <button type="submit" className="btn-submit" disabled={submitting || !title.trim()}>
-          {submitting ? 'Adding...' : 'Add to daybook'}
-        </button>
-      </form>
-
-      {/* Filter Pills */}
-      <div className="filters-row">
-        {['All', 'Activities', 'Projects', 'Assignments'].map((filterName) => (
-          <button
-            key={filterName}
-            type="button"
-            className={`filter-pill ${activeFilter === filterName ? 'active' : ''}`}
-            onClick={() => setActiveFilter(filterName)}
-          >
-            {filterName}
-          </button>
-        ))}
-      </div>
-
-      {/* Entries List */}
-      <div className="entries-list">
-        {loading ? (
-          <div className="empty-state">Loading daybook...</div>
-        ) : filteredEntries.length === 0 ? (
-          <div className="empty-state">No entries recorded yet.</div>
-        ) : (
-          filteredEntries.map((entry) => (
-            <div key={entry.id} className="entry-card">
-              <div className="entry-header">
-                <div className="entry-meta">
-                  <span className="entry-date">{formatDisplayDate(entry.date)}</span>
-                  <span className={`entry-type-pill ${entry.type}`}>{entry.type}</span>
-                </div>
-                <button
-                  type="button"
-                  className={`entry-status-badge ${entry.status.replace(/\s+/g, '-')}`}
-                  title="Click to toggle status"
-                  onClick={() => cycleStatus(entry)}
-                >
-                  {entry.status}
-                </button>
+            {/* DATE */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="entry-date">
+                Date
+              </label>
+              <div className="date-input-wrapper">
+                <input
+                  id="entry-date"
+                  className="input-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                />
+                <span className="date-chevron">▼</span>
               </div>
+            </div>
 
-              <h3 className="entry-title">
-                {entry.title}
-              </h3>
-
-              {entry.notes && <p className="entry-notes">{entry.notes}</p>}
-
-              <div className="entry-footer">
-                <div />
+            {/* TYPE */}
+            <div className="form-group">
+              <label className="form-label">Type</label>
+              <div className="segmented-row">
                 <button
                   type="button"
-                  className="btn-delete"
-                  onClick={() => handleDelete(entry.id)}
+                  className={`seg-btn ${type === 'Activity' ? 'active-type' : ''}`}
+                  onClick={() => setType('Activity')}
                 >
-                  Delete
+                  Activity
+                </button>
+                <button
+                  type="button"
+                  className={`seg-btn ${type === 'Project' ? 'active-type' : ''}`}
+                  onClick={() => setType('Project')}
+                >
+                  Project
+                </button>
+                <button
+                  type="button"
+                  className={`seg-btn ${type === 'Assignment' ? 'active-type' : ''}`}
+                  onClick={() => setType('Assignment')}
+                >
+                  Assignment
                 </button>
               </div>
             </div>
-          ))
-        )}
+
+            {/* STATUS */}
+            <div className="form-group">
+              <label className="form-label">Status</label>
+              <div className="segmented-row">
+                <button
+                  type="button"
+                  className={`seg-btn ${status === 'Pending' ? 'active-pending' : ''}`}
+                  onClick={() => setStatus('Pending')}
+                >
+                  Pending
+                </button>
+                <button
+                  type="button"
+                  className={`seg-btn ${status === 'In Progress' ? 'active-inprogress' : ''}`}
+                  onClick={() => setStatus('In Progress')}
+                >
+                  In Progress
+                </button>
+                <button
+                  type="button"
+                  className={`seg-btn ${status === 'Completed' ? 'active-completed' : ''}`}
+                  onClick={() => setStatus('Completed')}
+                >
+                  Completed
+                </button>
+              </div>
+            </div>
+
+            {/* NOTES */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="entry-notes">
+                Notes
+              </label>
+              <textarea
+                id="entry-notes"
+                className="input-notes"
+                rows="2"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+
+            {/* SUBMIT BUTTON */}
+            <button type="submit" className="btn-submit" disabled={submitting || !title.trim()}>
+              {submitting ? 'Adding...' : 'Add to daybook'}
+            </button>
+          </form>
+        </div>
+
+        {/* Right Column: Filters + Entries List */}
+        <div className="daybook-entries-col">
+          {/* Filter Pills */}
+          <div className="filters-row">
+            {['All', 'Activities', 'Projects', 'Assignments'].map((filterName) => (
+              <button
+                key={filterName}
+                type="button"
+                className={`filter-pill ${activeFilter === filterName ? 'active' : ''}`}
+                onClick={() => setActiveFilter(filterName)}
+              >
+                {filterName}
+              </button>
+            ))}
+          </div>
+
+          {/* Entries List */}
+          <div className="entries-list">
+            {loading ? (
+              <div className="empty-state">Loading daybook...</div>
+            ) : filteredEntries.length === 0 ? (
+              <div className="empty-state">No entries recorded yet.</div>
+            ) : (
+              filteredEntries.map((entry) => (
+                <div key={entry.id} className="entry-card">
+                  <div className="entry-header">
+                    <div className="entry-meta">
+                      <span className="entry-date">{formatDisplayDate(entry.date)}</span>
+                      <span className={`entry-type-pill ${entry.type}`}>{entry.type}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className={`entry-status-badge ${entry.status.replace(/\s+/g, '-')}`}
+                      title="Click to toggle status"
+                      onClick={() => cycleStatus(entry)}
+                    >
+                      {entry.status}
+                    </button>
+                  </div>
+
+                  <h3 className="entry-title">
+                    {entry.title}
+                  </h3>
+
+                  {entry.notes && <p className="entry-notes">{entry.notes}</p>}
+
+                  <div className="entry-footer">
+                    <div />
+                    <button
+                      type="button"
+                      className="btn-delete"
+                      onClick={() => handleDelete(entry.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
