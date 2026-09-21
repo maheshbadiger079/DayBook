@@ -1,7 +1,6 @@
-/* Daybook Minimalist Black & White Theme */
+/* Daybook Minimalist Black & White Theme - Times New Roman (Straight / Non-Italic) */
 :root {
-  --font-serif: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif;
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-main: 'Times New Roman', Times, serif;
   
   /* Black & White Canvas & Cards */
   --bg-canvas: #fafafa;
@@ -52,12 +51,15 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: var(--font-main);
+  font-style: normal !important;
 }
 
 body {
   background-color: var(--bg-canvas);
   color: var(--text-body);
-  font-family: var(--font-sans);
+  font-family: var(--font-main);
+  font-style: normal;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -112,7 +114,6 @@ body {
 }
 
 .daybook-title {
-  font-family: var(--font-serif);
   font-size: 3.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -122,8 +123,6 @@ body {
 }
 
 .daybook-subtitle {
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1.15rem;
   color: var(--text-subtitle);
   font-weight: 400;
@@ -149,13 +148,12 @@ body {
 }
 
 .form-label {
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1.05rem;
   color: var(--text-label);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 600;
 }
 
 /* Underlined Title Input */
@@ -164,8 +162,6 @@ body {
   border: none;
   border-bottom: 1px solid var(--border-muted);
   color: var(--text-title);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1.2rem;
   padding: 0.35rem 0 0.5rem;
   outline: none;
@@ -195,8 +191,6 @@ body {
   background: transparent;
   border: none;
   color: var(--text-title);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1.2rem;
   outline: none;
   width: 100%;
@@ -225,8 +219,6 @@ body {
   border: 1px solid var(--border-muted);
   border-radius: 10px;
   color: var(--text-body);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1rem;
   padding: 0.65rem 0.5rem;
   cursor: pointer;
@@ -278,8 +270,6 @@ body {
   border: 1px solid var(--border-muted);
   border-radius: 10px;
   color: var(--text-title);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1rem;
   padding: 0.65rem 0.85rem;
   outline: none;
@@ -296,8 +286,6 @@ body {
 .btn-submit {
   background-color: var(--btn-black-bg);
   color: var(--btn-black-text);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 1.25rem;
   font-weight: 600;
   border: none;
@@ -332,8 +320,6 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-muted);
   color: var(--text-body);
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 0.95rem;
   padding: 0.45rem 1.15rem;
   border-radius: var(--radius-pill);
@@ -391,17 +377,13 @@ body {
 }
 
 .entry-date {
-  font-family: var(--font-serif);
-  font-style: italic;
   font-size: 0.95rem;
   color: var(--text-subtitle);
 }
 
 /* Type Pill (Monochrome) */
 .entry-type-pill {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   padding: 0.15rem 0.65rem;
   border-radius: var(--radius-pill);
   font-weight: 600;
@@ -433,9 +415,7 @@ body {
 }
 
 .entry-status-badge {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   padding: 0.22rem 0.75rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
@@ -449,7 +429,6 @@ body {
 }
 
 .entry-title {
-  font-family: var(--font-serif);
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-title);
@@ -457,9 +436,7 @@ body {
 }
 
 .entry-notes {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #52525b;
   line-height: 1.45;
   white-space: pre-wrap;
@@ -477,9 +454,7 @@ body {
   background: transparent;
   border: none;
   color: var(--text-subtitle);
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: color 0.15s ease;
   padding: 0.2rem 0.4rem;
@@ -496,8 +471,6 @@ body {
   background: var(--bg-card);
   border: 1px dashed var(--border-muted);
   border-radius: var(--radius-card);
-  font-family: var(--font-serif);
-  font-style: italic;
   color: var(--text-subtitle);
   font-size: 1.05rem;
 }
