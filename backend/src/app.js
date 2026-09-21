@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const config = require('./config/env');
 const healthRoutes = require('./routes/healthRoutes');
+const entryRoutes = require('./routes/entryRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const notFoundHandler = require('./middleware/notFoundHandler');
 const { successResponse } = require('./utils/response');
@@ -52,28 +53,23 @@ app.get('/api', (req, res) => {
   return successResponse(
     res,
     {
-      name: 'WorkTrack API',
+      name: 'Daybook & WorkTrack API',
       version: '1.0.0',
-      tagline: 'Track. Organize. Complete. Improve.',
+      tagline: 'Track activities, projects and assignments by date',
       documentation: '/api/docs',
       healthCheck: '/api/health',
       endpoints: [
         '/api/health',
-        '/api/auth',
-        '/api/activities',
-        '/api/projects',
-        '/api/tasks',
-        '/api/assignments',
-        '/api/dashboard',
-        '/api/reports',
+        '/api/entries',
       ],
     },
-    'Welcome to WorkTrack REST API'
+    'Welcome to Daybook REST API'
   );
 });
 
 // Register Core Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/entries', entryRoutes);
 
 // 404 Handler
 app.use(notFoundHandler);

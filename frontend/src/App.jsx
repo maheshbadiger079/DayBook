@@ -1,251 +1,323 @@
 import { useState, useEffect } from 'react';
 
-function App() {
-  const [healthData, setHealthData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastChecked, setLastChecked] = useState(null);
+// Format YYYY-MM-DD to DD/MM/YYYY for display
+const formatDisplayDate = (isoDate) => {
+  if (!isoDate) return '';
+  const parts = isoDate.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return isoDate;
+};
 
-  const fetchHealth = async () => {
-    setLoading(true);
-    setError(null);
+// Get today in YYYY-MM-DD for input value
+const getTodayIso = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export default function App() {
+  // Form fields
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState(getTodayIso());
+  const [type, setType] = useState('Activity'); // Activity | Project | Assignment
+  const [status, setStatus] = useState('Pending'); // Pending | In Progress | Completed
+  const [notes, setNotes] = useState('');
+
+  // UI & Data states
+  const [entries, setEntries] = useState([]);
+  const [activeFilter, setActiveFilter] = useState('All'); // All | Activities | Projects | Assignments
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch entries from backend
+  const fetchEntries = async () => {
     try {
-      const response = await fetch('/api/health');
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setHealthData(data.data);
-      } else {
-        setError(data.message || 'Failed to fetch backend health status');
+      const res = await fetch('/api/entries');
+      const data = await res.json();
+      if (data.success) {
+        setEntries(data.data);
       }
     } catch (err) {
-      setError(err.message || 'Cannot reach backend server. Ensure Express is running on port 5000.');
+      console.error('Error fetching daybook entries:', err);
     } finally {
       setLoading(false);
-      setLastChecked(new Date().toLocaleTimeString());
     }
   };
 
   useEffect(() => {
-    fetchHealth();
+    fetchEntries();
   }, []);
 
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title.trim(),
+          date,
+          type,
+          status,
+          notes: notes.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // Prepend new entry
+        setEntries((prev) => [data.data, ...prev]);
+        // Reset inputs
+        setTitle('');
+        setNotes('');
+        // Keep date, type, status as convenient defaults
+      }
+    } catch (err) {
+      console.error('Error creating entry:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Toggle status cycling (Pending -> In Progress -> Completed -> Pending)
+  const cycleStatus = async (entry) => {
+    const nextStatus =
+      entry.status === 'Pending'
+        ? 'In Progress'
+        : entry.status === 'In Progress'
+        ? 'Completed'
+        : 'Pending';
+
+    try {
+      const res = await fetch(`/api/entries/${entry.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEntries((prev) =>
+          prev.map((item) => (item.id === entry.id ? data.data : item))
+        );
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+    }
+  };
+
+  // Delete entry
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this daybook entry?')) return;
+    try {
+      const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setEntries((prev) => prev.filter((item) => item.id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting entry:', err);
+    }
+  };
+
+  // Filtered entries
+  const filteredEntries = entries.filter((item) => {
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Activities') return item.type === 'Activity';
+    if (activeFilter === 'Projects') return item.type === 'Project';
+    if (activeFilter === 'Assignments') return item.type === 'Assignment';
+    return true;
+  });
+
   return (
-    <div className="app-container">
+    <div className="daybook-app">
       {/* Header */}
-      <header className="app-header">
-        <div className="brand-wrapper">
-          <div className="brand-icon">⚡</div>
-          <div>
-            <h1 className="brand-title">WorkTrack</h1>
-            <p className="brand-tagline">Track. Organize. Complete. Improve.</p>
-          </div>
-        </div>
-        <div className="phase-pill">
-          <span>●</span> Phase 1 — Project Initialization
-        </div>
+      <header className="daybook-header">
+        <h1 className="daybook-title">Daybook</h1>
+        <p className="daybook-subtitle">Track activities, projects and assignments by date</p>
       </header>
 
-      {/* Main Grid */}
-      <div className="grid-2">
-        {/* PostgreSQL & Backend Connection Status */}
-        <div className="card">
-          <div className="card-title">
-            <span>System Connectivity</span>
-            {loading ? (
-              <span className="status-badge loading">
-                <span className="pulse-dot"></span> Testing...
-              </span>
-            ) : error ? (
-              <span className="status-badge error">
-                <span className="pulse-dot"></span> Disconnected
-              </span>
-            ) : (
-              <span className="status-badge healthy">
-                <span className="pulse-dot"></span> PostgreSQL Connected
-              </span>
-            )}
+      {/* Main Form Card */}
+      <form className="daybook-card" onSubmit={handleSubmit}>
+        {/* TITLE */}
+        <div className="form-group">
+          <label className="form-label" htmlFor="entry-title">
+            What is it?
+          </label>
+          <input
+            id="entry-title"
+            className="input-underlined"
+            type="text"
+            placeholder="e.g. Finish math homework"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            autoComplete="off"
+          />
+        </div>
+
+        {/* DATE */}
+        <div className="form-group">
+          <label className="form-label" htmlFor="entry-date">
+            Date
+          </label>
+          <div className="date-input-wrapper">
+            <input
+              id="entry-date"
+              className="input-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+            <span className="date-chevron">▼</span>
           </div>
-          <p className="card-subtitle">
-            Live verification between React frontend, Express.js backend, and PostgreSQL database.
-          </p>
+        </div>
 
-          {error ? (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '1.25rem' }}>
-              <p style={{ color: '#f87171', fontSize: '0.9rem', fontWeight: 600 }}>Connection Error</p>
-              <p style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>{error}</p>
-            </div>
-          ) : healthData ? (
-            <div>
-              <div className="data-row">
-                <span className="data-label">API Status</span>
-                <span className="data-val" style={{ color: '#34d399', fontWeight: 600 }}>{healthData.status.toUpperCase()}</span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Database Name</span>
-                <span className="data-val code">{healthData.database.database}</span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">PostgreSQL Version</span>
-                <span className="data-val code" style={{ fontSize: '0.75rem' }}>{healthData.database.version ? healthData.database.version.split(' ')[0] + ' ' + healthData.database.version.split(' ')[1] : 'v18'}</span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Server Uptime</span>
-                <span className="data-val">{healthData.uptimeSeconds} seconds</span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Environment</span>
-                <span className="data-val code">{healthData.environment}</span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Node Runtime</span>
-                <span className="data-val code">{healthData.system.nodeVersion}</span>
-              </div>
-            </div>
-          ) : null}
-
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={fetchHealth} disabled={loading}>
-              {loading ? 'Checking...' : '🔄 Re-test Connection'}
+        {/* TYPE */}
+        <div className="form-group">
+          <label className="form-label">Type</label>
+          <div className="segmented-row">
+            <button
+              type="button"
+              className={`seg-btn ${type === 'Activity' ? 'active-activity' : ''}`}
+              onClick={() => setType('Activity')}
+            >
+              Activity
             </button>
-            {lastChecked && (
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Last checked: {lastChecked}
-              </span>
-            )}
+            <button
+              type="button"
+              className={`seg-btn ${type === 'Project' ? 'active-project' : ''}`}
+              onClick={() => setType('Project')}
+            >
+              Project
+            </button>
+            <button
+              type="button"
+              className={`seg-btn ${type === 'Assignment' ? 'active-assignment' : ''}`}
+              onClick={() => setType('Assignment')}
+            >
+              Assignment
+            </button>
           </div>
         </div>
 
-        {/* Phase 1 Verification Checklist */}
-        <div className="card">
-          <div className="card-title">
-            <span>Phase 1 Deliverables</span>
-            <span className="status-badge healthy">Ready</span>
+        {/* STATUS */}
+        <div className="form-group">
+          <label className="form-label">Status</label>
+          <div className="segmented-row">
+            <button
+              type="button"
+              className={`seg-btn ${status === 'Pending' ? 'active-pending' : ''}`}
+              onClick={() => setStatus('Pending')}
+            >
+              Pending
+            </button>
+            <button
+              type="button"
+              className={`seg-btn ${status === 'In Progress' ? 'active-inprogress' : ''}`}
+              onClick={() => setStatus('In Progress')}
+            >
+              In Progress
+            </button>
+            <button
+              type="button"
+              className={`seg-btn ${status === 'Completed' ? 'active-completed' : ''}`}
+              onClick={() => setStatus('Completed')}
+            >
+              Completed
+            </button>
           </div>
-          <p className="card-subtitle">
-            Initial setup, configuration, and connectivity verification checklist.
-          </p>
+        </div>
 
-          <div>
-            <div className="check-item">
-              <span className="check-icon">✓</span>
-              <div>
-                <strong>Git Repository Initialized</strong>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Root repository created with clean .gitignore</p>
-              </div>
-            </div>
-            <div className="check-item">
-              <span className="check-icon">✓</span>
-              <div>
-                <strong>Node.js & Express REST Backend</strong>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Express server with Helmet, CORS, Rate Limiting & Morgan</p>
-              </div>
-            </div>
-            <div className="check-item">
-              <span className="check-icon">✓</span>
-              <div>
-                <strong>PostgreSQL 18 Database Setup</strong>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Database "worktrack" created & connection pool active</p>
-              </div>
-            </div>
-            <div className="check-item">
-              <span className="check-icon">✓</span>
-              <div>
-                <strong>React.js Frontend Initialized</strong>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Vite + React with modern responsive SaaS theme</p>
-              </div>
-            </div>
-            <div className="check-item">
-              <span className="check-icon">✓</span>
-              <div>
-                <strong>Health-Check Endpoint Active</strong>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>GET /api/health responding with live DB metrics</p>
-              </div>
-            </div>
-          </div>
+        {/* NOTES */}
+        <div className="form-group">
+          <label className="form-label" htmlFor="entry-notes">
+            Notes
+          </label>
+          <textarea
+            id="entry-notes"
+            className="input-notes"
+            rows="2"
+            placeholder="Add details, references, or reflections..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
         </div>
-      </div>
 
-      {/* System Architecture Overview */}
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <div className="card-title">
-          <span>Full-Stack Architecture Flow</span>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Standard MVC & Layered Pattern</span>
-        </div>
-        <p className="card-subtitle">
-          Data flow from user interaction to persistent relational storage.
-        </p>
+        {/* SUBMIT BUTTON */}
+        <button type="submit" className="btn-submit" disabled={submitting || !title.trim()}>
+          {submitting ? 'Adding...' : 'Add to daybook'}
+        </button>
+      </form>
 
-        <div className="arch-flow">
-          <div className="arch-node">
-            <span className="arch-node-title">React Frontend</span>
-            <span className="arch-node-sub">Port 5173 (Vite)</span>
-          </div>
-          <span className="arch-arrow">➔</span>
-          <div className="arch-node">
-            <span className="arch-node-title">Vite Proxy</span>
-            <span className="arch-node-sub">/api forwarding</span>
-          </div>
-          <span className="arch-arrow">➔</span>
-          <div className="arch-node">
-            <span className="arch-node-title">Express API</span>
-            <span className="arch-node-sub">Port 5000</span>
-          </div>
-          <span className="arch-arrow">➔</span>
-          <div className="arch-node">
-            <span className="arch-node-title">Controller / Service</span>
-            <span className="arch-node-sub">Business Logic</span>
-          </div>
-          <span className="arch-arrow">➔</span>
-          <div className="arch-node">
-            <span className="arch-node-title">pg.Pool Client</span>
-            <span className="arch-node-sub">Parameterized SQL</span>
-          </div>
-          <span className="arch-arrow">➔</span>
-          <div className="arch-node">
-            <span className="arch-node-title">PostgreSQL 18</span>
-            <span className="arch-node-sub">Port 5432 (worktrack)</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Links / Endpoints */}
-      <div className="grid-3">
-        <div className="card">
-          <div className="card-title" style={{ fontSize: '1rem' }}>REST API Base</div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            Root API endpoint providing service metadata.
-          </p>
-          <a href="/api" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ width: '100%' }}>
-            Open /api ↗
-          </a>
-        </div>
-        <div className="card">
-          <div className="card-title" style={{ fontSize: '1rem' }}>Health Status API</div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            JSON health-check endpoint querying PostgreSQL.
-          </p>
-          <a href="/api/health" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ width: '100%' }}>
-            Open /api/health ↗
-          </a>
-        </div>
-        <div className="card">
-          <div className="card-title" style={{ fontSize: '1rem' }}>Next: Phase 2 Database</div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            Ready to design & migrate normalized schema.
-          </p>
-          <button className="btn btn-secondary" style={{ width: '100%', opacity: 0.7, cursor: 'default' }}>
-            Awaiting Confirmation 🔒
+      {/* Filter Pills */}
+      <div className="filters-row">
+        {['All', 'Activities', 'Projects', 'Assignments'].map((filterName) => (
+          <button
+            key={filterName}
+            type="button"
+            className={`filter-pill ${activeFilter === filterName ? 'active' : ''}`}
+            onClick={() => setActiveFilter(filterName)}
+          >
+            {filterName}
           </button>
-        </div>
+        ))}
       </div>
 
-      {/* Footer */}
-      <footer className="app-footer">
-        <p>WorkTrack &bull; Production-Quality Daily Activity, Project & Assignment Management System</p>
-        <p style={{ marginTop: '0.35rem', fontSize: '0.8rem' }}>Built with React.js, Express.js, and PostgreSQL 18</p>
-      </footer>
+      {/* Entries List */}
+      <div className="entries-list">
+        {loading ? (
+          <div className="empty-state">Loading daybook...</div>
+        ) : filteredEntries.length === 0 ? (
+          <div className="empty-state">No entries in this view yet.</div>
+        ) : (
+          filteredEntries.map((entry) => (
+            <div key={entry.id} className="entry-card">
+              <div className="entry-header">
+                <div className="entry-meta">
+                  <span className="entry-date">{formatDisplayDate(entry.date)}</span>
+                  <span className={`entry-type-pill ${entry.type}`}>{entry.type}</span>
+                </div>
+                <button
+                  type="button"
+                  className={`entry-status-badge ${entry.status.replace(/\s+/g, '-')}`}
+                  title="Click to change status"
+                  onClick={() => cycleStatus(entry)}
+                >
+                  {entry.status}
+                </button>
+              </div>
+
+              <h3 className={`entry-title ${entry.status === 'Completed' ? 'completed' : ''}`}>
+                {entry.title}
+              </h3>
+
+              {entry.notes && <p className="entry-notes">{entry.notes}</p>}
+
+              <div className="entry-footer">
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: 'var(--font-serif)' }}>
+                  {entry.status === 'Completed' ? '✓ Completed' : 'Tap badge to update status'}
+                </span>
+                <button
+                  type="button"
+                  className="btn-delete"
+                  onClick={() => handleDelete(entry.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
-
-export default App;
