@@ -1,39 +1,52 @@
-/* Daybook Typography & Design System */
+/* Daybook Minimalist Black & White Theme */
 :root {
   --font-serif: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  --bg-canvas: #151511;
-  --bg-card: #1d1d16;
-  --bg-card-subtle: #24241c;
-  --bg-input: #171712;
-  --border-muted: #2d2d23;
-  --border-subtle: #38382c;
-  --border-highlight: #4c4c3b;
+  /* Black & White Canvas & Cards */
+  --bg-canvas: #fafafa;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f4f4f5;
+  --bg-input: #ffffff;
+  
+  --border-muted: #e4e4e7;
+  --border-subtle: #d4d4d8;
+  --border-highlight: #18181b;
 
-  --text-title: #eae5d7;
-  --text-subtitle: #9c9785;
-  --text-label: #b0ab99;
-  --text-body: #ded9cb;
-  --text-muted: #6e6b5d;
+  --text-title: #09090b;
+  --text-subtitle: #71717a;
+  --text-label: #27272a;
+  --text-body: #18181b;
+  --text-muted: #a1a1aa;
 
-  /* Button and accent tokens */
-  --btn-cream-bg: #ede7d8;
-  --btn-cream-text: #191913;
-  --btn-cream-hover: #f7f3e6;
+  /* Primary Action Buttons (Solid Black & White) */
+  --btn-black-bg: #09090b;
+  --btn-black-text: #ffffff;
+  --btn-black-hover: #27272a;
 
-  --sage-green: #9bb487;
-  --sage-green-text: #182213;
+  /* Status Colors */
+  /* Pending = RED */
+  --status-pending-bg: #fef2f2;
+  --status-pending-border: #fecaca;
+  --status-pending-text: #dc2626;
+  --status-pending-btn-bg: #dc2626;
 
-  --amber-warm: #d4a373;
-  --amber-text: #24190e;
+  /* In Progress = BLUE */
+  --status-inprogress-bg: #eff6ff;
+  --status-inprogress-border: #bfdbfe;
+  --status-inprogress-text: #2563eb;
+  --status-inprogress-btn-bg: #2563eb;
 
-  --slate-warm: #8fa4a6;
-  --slate-text: #141f21;
+  /* Completed = GREEN */
+  --status-completed-bg: #f0fdf4;
+  --status-completed-border: #bbf7d0;
+  --status-completed-text: #16a34a;
+  --status-completed-btn-bg: #16a34a;
 
   --radius-pill: 9999px;
   --radius-btn: 12px;
-  --radius-card: 18px;
+  --radius-card: 16px;
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
 * {
@@ -74,7 +87,7 @@ body {
   font-family: var(--font-serif);
   font-size: 3.25rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text-title);
   line-height: 1.1;
   margin-bottom: 0.35rem;
@@ -93,11 +106,11 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border-muted);
   border-radius: var(--radius-card);
-  padding: 1.65rem 1.65rem 1.85rem;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 /* Form Group */
@@ -121,7 +134,7 @@ body {
 .input-underlined {
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-muted);
   color: var(--text-title);
   font-family: var(--font-serif);
   font-style: italic;
@@ -132,13 +145,8 @@ body {
   width: 100%;
 }
 
-.input-underlined::placeholder {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
 .input-underlined:focus {
-  border-bottom-color: var(--text-label);
+  border-bottom-color: var(--border-highlight);
 }
 
 /* Date Input Wrapper */
@@ -146,8 +154,13 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border-highlight);
+  border-bottom: 1px solid var(--border-muted);
   padding-bottom: 0.35rem;
+  transition: border-color 0.2s ease;
+}
+
+.date-input-wrapper:focus-within {
+  border-bottom-color: var(--border-highlight);
 }
 
 .input-date {
@@ -156,21 +169,20 @@ body {
   color: var(--text-title);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   outline: none;
   width: 100%;
   cursor: pointer;
   padding: 0.2rem 0;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .date-chevron {
   position: absolute;
   right: 0.2rem;
   pointer-events: none;
-  color: var(--text-label);
-  font-size: 0.85rem;
-  opacity: 0.8;
+  color: var(--text-subtitle);
+  font-size: 0.8rem;
 }
 
 /* Segmented Buttons for Type & Status */
@@ -181,8 +193,8 @@ body {
 }
 
 .seg-btn {
-  background: var(--bg-card-subtle);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  border: 1px solid var(--border-muted);
   border-radius: 10px;
   color: var(--text-body);
   font-family: var(--font-serif);
@@ -196,57 +208,46 @@ body {
 }
 
 .seg-btn:hover {
-  background: #2b2b22;
+  background: var(--bg-card-subtle);
 }
 
-/* Active Segmented States */
-.seg-btn.active-activity {
-  background-color: var(--sage-green);
-  border-color: var(--sage-green);
-  color: var(--sage-green-text);
+/* Active Segmented States for Type (Black & White) */
+.seg-btn.active-type {
+  background-color: var(--btn-black-bg);
+  border-color: var(--btn-black-bg);
+  color: var(--btn-black-text);
   font-weight: 600;
 }
 
-.seg-btn.active-project {
-  background-color: var(--amber-warm);
-  border-color: var(--amber-warm);
-  color: var(--amber-text);
-  font-weight: 600;
-}
-
-.seg-btn.active-assignment {
-  background-color: var(--slate-warm);
-  border-color: var(--slate-warm);
-  color: var(--slate-text);
-  font-weight: 600;
-}
-
-/* Status Segmented Buttons */
+/* Active Segmented States for Status */
+/* Pending = RED */
 .seg-btn.active-pending {
-  background-color: #beb69f;
-  border-color: #beb69f;
-  color: #1e1d17;
+  background-color: var(--status-pending-btn-bg);
+  border-color: var(--status-pending-btn-bg);
+  color: #ffffff;
   font-weight: 600;
 }
 
+/* In Progress = BLUE */
 .seg-btn.active-inprogress {
-  background-color: var(--amber-warm);
-  border-color: var(--amber-warm);
-  color: var(--amber-text);
+  background-color: var(--status-inprogress-btn-bg);
+  border-color: var(--status-inprogress-btn-bg);
+  color: #ffffff;
   font-weight: 600;
 }
 
+/* Completed = GREEN */
 .seg-btn.active-completed {
-  background-color: var(--sage-green);
-  border-color: var(--sage-green);
-  color: var(--sage-green-text);
+  background-color: var(--status-completed-btn-bg);
+  border-color: var(--status-completed-btn-bg);
+  color: #ffffff;
   font-weight: 600;
 }
 
 /* Notes Textarea */
 .input-notes {
   background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-muted);
   border-radius: 10px;
   color: var(--text-title);
   font-family: var(--font-serif);
@@ -255,23 +256,18 @@ body {
   padding: 0.65rem 0.85rem;
   outline: none;
   resize: vertical;
-  min-height: 60px;
+  min-height: 65px;
   transition: border-color 0.2s ease;
 }
 
-.input-notes::placeholder {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
 .input-notes:focus {
-  border-color: var(--text-label);
+  border-color: var(--border-highlight);
 }
 
-/* Add to Daybook Main Button */
+/* Add to Daybook Main Button (Crisp Black) */
 .btn-submit {
-  background-color: var(--btn-cream-bg);
-  color: var(--btn-cream-text);
+  background-color: var(--btn-black-bg);
+  color: var(--btn-black-text);
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 1.25rem;
@@ -280,23 +276,23 @@ body {
   border-radius: var(--radius-btn);
   padding: 0.85rem;
   cursor: pointer;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: var(--btn-cream-hover);
+  background-color: var(--btn-black-hover);
   transform: translateY(-1px);
 }
 
 .btn-submit:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Filters Section */
+/* Filters Section (Black & White Pills) */
 .filters-row {
   display: flex;
   gap: 0.5rem;
@@ -307,8 +303,8 @@ body {
 
 .filter-pill {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-label);
+  border: 1px solid var(--border-muted);
+  color: var(--text-body);
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.95rem;
@@ -324,9 +320,9 @@ body {
 }
 
 .filter-pill.active {
-  background-color: var(--btn-cream-bg);
-  color: var(--btn-cream-text);
-  border-color: var(--btn-cream-bg);
+  background-color: var(--btn-black-bg);
+  color: var(--btn-black-text);
+  border-color: var(--btn-black-bg);
   font-weight: 600;
 }
 
@@ -334,7 +330,7 @@ body {
 .entries-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-top: 0.5rem;
 }
 
@@ -342,15 +338,17 @@ body {
   background-color: var(--bg-card);
   border: 1px solid var(--border-muted);
   border-radius: 14px;
-  padding: 1.15rem 1.25rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  transition: border-color 0.2s ease;
+  gap: 0.55rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 }
 
 .entry-card:hover {
   border-color: var(--border-subtle);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
 }
 
 .entry-header {
@@ -373,6 +371,7 @@ body {
   color: var(--text-subtitle);
 }
 
+/* Type Pill (Monochrome) */
 .entry-type-pill {
   font-family: var(--font-serif);
   font-style: italic;
@@ -380,50 +379,47 @@ body {
   padding: 0.15rem 0.65rem;
   border-radius: var(--radius-pill);
   font-weight: 600;
+  background-color: var(--bg-card-subtle);
+  color: var(--text-body);
+  border: 1px solid var(--border-muted);
 }
 
-.entry-type-pill.Activity {
-  background-color: rgba(155, 180, 135, 0.2);
-  color: var(--sage-green);
-  border: 1px solid rgba(155, 180, 135, 0.4);
+/* STATUS BADGES WITH REQUESTED COLORS */
+/* Pending = RED */
+.entry-status-badge.Pending {
+  background-color: var(--status-pending-bg);
+  color: var(--status-pending-text);
+  border: 1px solid var(--status-pending-border);
 }
-.entry-type-pill.Project {
-  background-color: rgba(212, 163, 115, 0.2);
-  color: var(--amber-warm);
-  border: 1px solid rgba(212, 163, 115, 0.4);
+
+/* In Progress = BLUE */
+.entry-status-badge.In-Progress {
+  background-color: var(--status-inprogress-bg);
+  color: var(--status-inprogress-text);
+  border: 1px solid var(--status-inprogress-border);
 }
-.entry-type-pill.Assignment {
-  background-color: rgba(132, 169, 160, 0.2);
-  color: var(--slate-warm);
-  border: 1px solid rgba(132, 169, 160, 0.4);
+
+/* Completed = GREEN */
+.entry-status-badge.Completed {
+  background-color: var(--status-completed-bg);
+  color: var(--status-completed-text);
+  border: 1px solid var(--status-completed-border);
 }
 
 .entry-status-badge {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.8rem;
-  padding: 0.2rem 0.6rem;
+  font-size: 0.82rem;
+  padding: 0.22rem 0.75rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
   user-select: none;
   transition: all 0.15s ease;
+  font-weight: 600;
 }
 
-.entry-status-badge.Pending {
-  background: #2b2a22;
-  color: #c9c2ad;
-  border: 1px solid #474538;
-}
-.entry-status-badge.In-Progress {
-  background: rgba(212, 163, 115, 0.2);
-  color: var(--amber-warm);
-  border: 1px solid rgba(212, 163, 115, 0.4);
-}
-.entry-status-badge.Completed {
-  background: rgba(155, 180, 135, 0.2);
-  color: var(--sage-green);
-  border: 1px solid rgba(155, 180, 135, 0.4);
-  text-decoration: none;
+.entry-status-badge:hover {
+  opacity: 0.85;
 }
 
 .entry-title {
@@ -438,8 +434,8 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.95rem;
-  color: var(--text-label);
-  line-height: 1.4;
+  color: #52525b;
+  line-height: 1.45;
   white-space: pre-wrap;
 }
 
@@ -447,14 +443,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.35rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--border-muted);
 }
 
 .btn-delete {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-subtitle);
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.85rem;
@@ -464,7 +460,7 @@ body {
 }
 
 .btn-delete:hover {
-  color: #ef4444;
+  color: #dc2626;
 }
 
 /* Empty State */
@@ -472,10 +468,10 @@ body {
   text-align: center;
   padding: 2.5rem 1.5rem;
   background: var(--bg-card);
-  border: 1px dashed var(--border-subtle);
+  border: 1px dashed var(--border-muted);
   border-radius: var(--radius-card);
   font-family: var(--font-serif);
   font-style: italic;
-  color: var(--text-muted);
-  font-size: 1.1rem;
+  color: var(--text-subtitle);
+  font-size: 1.05rem;
 }

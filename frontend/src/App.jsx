@@ -186,21 +186,21 @@ export default function App() {
           <div className="segmented-row">
             <button
               type="button"
-              className={`seg-btn ${type === 'Activity' ? 'active-activity' : ''}`}
+              className={`seg-btn ${type === 'Activity' ? 'active-type' : ''}`}
               onClick={() => setType('Activity')}
             >
               Activity
             </button>
             <button
               type="button"
-              className={`seg-btn ${type === 'Project' ? 'active-project' : ''}`}
+              className={`seg-btn ${type === 'Project' ? 'active-type' : ''}`}
               onClick={() => setType('Project')}
             >
               Project
             </button>
             <button
               type="button"
-              className={`seg-btn ${type === 'Assignment' ? 'active-assignment' : ''}`}
+              className={`seg-btn ${type === 'Assignment' ? 'active-type' : ''}`}
               onClick={() => setType('Assignment')}
             >
               Assignment
