@@ -46,7 +46,6 @@
   --radius-pill: 9999px;
   --radius-btn: 12px;
   --radius-card: 16px;
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
 * {
@@ -136,7 +135,7 @@ body {
   border: 1px solid var(--border-muted);
   border-radius: var(--radius-card);
   padding: 1.75rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
@@ -308,7 +307,6 @@ body {
   margin-top: 0.25rem;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-submit:hover:not(:disabled) {
@@ -371,13 +369,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: none;
   transition: all 0.2s ease;
 }
 
 .entry-card:hover {
   border-color: var(--border-subtle);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
 }
 
 .entry-header {
