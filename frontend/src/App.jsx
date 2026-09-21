@@ -155,7 +155,6 @@ export default function App() {
             id="entry-title"
             className="input-underlined"
             type="text"
-            placeholder="e.g. Finish math homework"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -246,7 +245,6 @@ export default function App() {
             id="entry-notes"
             className="input-notes"
             rows="2"
-            placeholder="Add details, references, or reflections..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
@@ -277,7 +275,7 @@ export default function App() {
         {loading ? (
           <div className="empty-state">Loading daybook...</div>
         ) : filteredEntries.length === 0 ? (
-          <div className="empty-state">No entries in this view yet.</div>
+          <div className="empty-state">No entries recorded yet.</div>
         ) : (
           filteredEntries.map((entry) => (
             <div key={entry.id} className="entry-card">
@@ -289,23 +287,21 @@ export default function App() {
                 <button
                   type="button"
                   className={`entry-status-badge ${entry.status.replace(/\s+/g, '-')}`}
-                  title="Click to change status"
+                  title="Click to toggle status"
                   onClick={() => cycleStatus(entry)}
                 >
                   {entry.status}
                 </button>
               </div>
 
-              <h3 className={`entry-title ${entry.status === 'Completed' ? 'completed' : ''}`}>
+              <h3 className="entry-title">
                 {entry.title}
               </h3>
 
               {entry.notes && <p className="entry-notes">{entry.notes}</p>}
 
               <div className="entry-footer">
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: 'var(--font-serif)' }}>
-                  {entry.status === 'Completed' ? '✓ Completed' : 'Tap badge to update status'}
-                </span>
+                <div />
                 <button
                   type="button"
                   className="btn-delete"
